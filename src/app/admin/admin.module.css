@@ -1,0 +1,112 @@
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.layout { display: flex; min-height: 100vh; background: #f0f4f8; }
+
+/* Mobile header */
+.mobileHeader {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: #fff; border-bottom: 1px solid #e8ecf1;
+  align-items: center; padding: 0 var(--space-md); gap: var(--space-md);
+}
+.menuBtn { background: none; border: none; color: var(--slate-600); padding: 4px; }
+.mobileTitle { font-weight: 600; font-size: 0.95rem; color: var(--slate-800); }
+
+/* Sidebar */
+.sidebar {
+  width: 220px; height: 100vh; position: fixed; top: 0; left: 0;
+  background: #fff; border-right: 1px solid #e8ecf1;
+  display: flex; flex-direction: column; z-index: 200;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.sidebarHeader {
+  display: flex; align-items: center; gap: 10px;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+.logoText { font-size: 0.95rem; font-weight: 700; color: var(--slate-900); }
+
+.menuLabel {
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em;
+  color: var(--slate-400); padding: var(--space-md) var(--space-lg) var(--space-sm);
+}
+
+.nav { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 0 var(--space-sm); }
+
+.navItem {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; border-radius: var(--radius-sm);
+  color: var(--slate-500); font-size: 0.88rem; font-weight: 500;
+  transition: all var(--transition-fast);
+}
+.navItem:hover { background: var(--slate-50); color: var(--slate-700); }
+.navActive {
+  background: var(--slate-100) !important; color: var(--slate-900) !important; font-weight: 600;
+}
+
+.sidebarFooter { padding: var(--space-md); border-top: 1px solid #e8ecf1; }
+.userInfo { display: flex; align-items: center; gap: 10px; }
+.userAvatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--slate-800); color: #fff; display: flex;
+  align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700;
+}
+.userDetails { flex: 1; display: flex; flex-direction: column; }
+.userName { font-size: 0.82rem; font-weight: 600; color: var(--slate-800); }
+.userRole { font-size: 0.7rem; color: var(--slate-400); }
+.logoutBtn {
+  padding: 6px; background: none; border: none;
+  color: var(--slate-400); transition: color var(--transition-fast);
+}
+.logoutBtn:hover { color: var(--danger); }
+
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3); z-index: 150;
+}
+
+/* Main area */
+.mainArea { flex: 1; margin-left: 220px; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Top bar */
+.topBar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  background: #fff; border-bottom: 1px solid #e8ecf1;
+  position: sticky; top: 0; z-index: 10;
+}
+
+.searchWrapper {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: var(--slate-50);
+  border-radius: var(--radius-full); width: 280px;
+  color: var(--slate-400);
+}
+.searchInput {
+  border: none; background: none; outline: none; flex: 1;
+  font-size: 0.85rem; color: var(--slate-700);
+}
+.searchInput::placeholder { color: var(--slate-400); }
+
+.topActions { display: flex; align-items: center; gap: var(--space-md); }
+.iconBtn {
+  padding: 6px; background: none; border: none;
+  color: var(--slate-400); transition: color var(--transition-fast);
+}
+.iconBtn:hover { color: var(--slate-700); }
+.topAvatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--slate-800); color: #fff; display: flex;
+  align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;
+}
+
+.mainContent { flex: 1; padding: var(--space-xl); }
+
+@media (max-width: 768px) {
+  .mobileHeader { display: flex; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebarOpen { transform: translateX(0); }
+  .overlay { display: block; }
+  .mainArea { margin-left: 0; }
+  .mainContent { padding: var(--space-md); padding-top: 68px; }
+  .topBar { display: none; }
+}

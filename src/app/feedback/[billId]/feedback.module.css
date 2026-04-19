@@ -1,0 +1,259 @@
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.main {
+  min-height: 100vh;
+  background: #111117;
+  position: relative;
+  overflow: hidden;
+}
+
+.watermark {
+  position: fixed;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(4rem, 14vw, 10rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.015);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Center message (loading/error) */
+.centerMessage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.errorText { color: var(--accent); }
+
+.ghostBtn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+}
+.ghostBtn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+/* Top bar */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  background: rgba(17,17,23,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.exitBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+.exitBtn:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+
+.billLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.06em;
+}
+
+/* Form area */
+.formArea {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  min-height: calc(100vh - 60px);
+  align-items: flex-start;
+}
+
+.card {
+  width: 100%;
+  max-width: 620px;
+  background: #1a1a24;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+}
+
+.stepLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: var(--space-sm);
+}
+
+.progressTrack {
+  width: 50%;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width 0.5s var(--ease-out);
+}
+
+/* Category block */
+.categoryBlock { animation: fadeIn 0.3s var(--ease-out); }
+.slideRight { animation: slideInRight 0.35s var(--ease-out); }
+.slideLeft { animation: slideInLeft 0.35s var(--ease-out); }
+
+.categoryTitle {
+  font-family: var(--font-sans);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.03em;
+  margin-bottom: var(--space-2xl);
+}
+
+/* Questions */
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.questionBlock {
+  animation: fadeInUp 0.35s var(--ease-out) forwards;
+  opacity: 0;
+}
+
+.questionText {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.qNum {
+  color: rgba(255,255,255,0.3);
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+/* Options — pill buttons like The Grind */
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.optionPill {
+  padding: 12px 22px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-full);
+  color: rgba(255,255,255,0.65);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.optionPill:hover {
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
+
+.optionActive {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: rgba(230, 57, 70, 0.08);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+.backBtn:hover:not(:disabled) { color: rgba(255,255,255,0.8); }
+.backBtn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.nextBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #f0ede6;
+  color: #111117;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+.nextBtn:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.nextBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .card { padding: var(--space-xl) var(--space-lg); }
+  .categoryTitle { font-size: 1.1rem; }
+  .optionPill { padding: 10px 16px; font-size: 0.82rem; }
+}

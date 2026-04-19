@@ -1,0 +1,35 @@
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.page { max-width: 1100px; animation: fadeIn 0.3s var(--ease-out); }
+.pageHeader { margin-bottom: var(--space-xl); }
+.pageHeader h1 { font-family: var(--font-sans); font-size: 1.6rem; font-weight: 700; color: var(--slate-900); margin-bottom: 2px; }
+.pageHeader p { font-size: 0.88rem; color: var(--slate-400); }
+
+.overallCard {
+  text-align: center; padding: var(--space-xl);
+  background: #fff; border: 1px solid #e8ecf1;
+  border-radius: var(--radius-md); margin-bottom: var(--space-xl);
+}
+.overallLabel { font-size: 0.88rem; color: var(--slate-400); margin-bottom: var(--space-sm); }
+.overallScore { font-size: 3.5rem; font-weight: 800; line-height: 1; }
+.overallMax { font-size: 1.2rem; color: var(--slate-300); font-weight: 500; margin-left: 4px; }
+.overallPct { margin-top: var(--space-sm); font-size: 0.85rem; color: var(--slate-400); }
+
+.chartsGrid { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-lg); }
+
+.chartCard {
+  background: #fff; border: 1px solid #e8ecf1;
+  border-radius: var(--radius-md); padding: var(--space-lg);
+}
+.chartCard h2 { font-family: var(--font-sans); font-size: 1rem; font-weight: 600; color: var(--slate-800); margin-bottom: var(--space-lg); }
+.chartArea { height: 280px; width: 100%; }
+
+.distList { display: flex; flex-direction: column; gap: var(--space-md); }
+.distRow { display: flex; align-items: center; gap: var(--space-md); }
+.distLabel { flex: 0 0 110px; font-size: 0.82rem; color: var(--slate-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.distBar { flex: 1; height: 8px; background: var(--slate-100); border-radius: var(--radius-full); overflow: hidden; }
+.distFill { height: 100%; border-radius: var(--radius-full); background: var(--info); transition: width 0.8s var(--ease-out); }
+.distCount { font-size: 0.82rem; font-weight: 600; color: var(--slate-700); width: 24px; text-align: right; }
+
+.loading, .empty { padding: var(--space-2xl); text-align: center; color: var(--slate-400); font-size: 0.88rem; }
+
+@media (max-width: 900px) { .chartsGrid { grid-template-columns: 1fr; } .chartArea { height: 240px; } }

@@ -199,6 +199,49 @@
   color: var(--accent);
 }
 
+.chipActive {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+/* Checkbox */
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Category selection */
+.categorySection {
+  animation: fadeIn 0.3s var(--ease-out);
+}
+
+.catLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.catHint {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: var(--space-md);
+}
+
 @media (max-width: 600px) {
   .card { padding: var(--space-xl) var(--space-lg); }
   .title { font-size: 1.3rem; }

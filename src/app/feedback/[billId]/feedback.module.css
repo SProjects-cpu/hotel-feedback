@@ -148,7 +148,19 @@
   font-weight: 800;
   color: #fff;
   letter-spacing: 0.03em;
+  margin-bottom: var(--space-sm);
+}
+
+.categoryHint {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
   margin-bottom: var(--space-2xl);
+}
+
+.infoText {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+  margin-bottom: var(--space-lg);
 }
 
 /* Questions */

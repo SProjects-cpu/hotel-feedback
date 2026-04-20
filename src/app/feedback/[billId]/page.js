@@ -1,15 +1,17 @@
 'use client';
 import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './feedback.module.css';
 
 export default function FeedbackPage({ params }) {
   const { billId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [bill, setBill] = useState(null);
+  const [guestMode, setGuestMode] = useState(false);
   const [categories, setCategories] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -21,10 +23,16 @@ export default function FeedbackPage({ params }) {
 
   const loadForm = async () => {
     try {
-      const res = await fetch(`/api/feedback/load-form?billId=${billId}`);
+      let url = `/api/feedback/load-form?billId=${billId}`;
+      const services = searchParams.get('services');
+      if (services) {
+        url += `&services=${encodeURIComponent(services)}`;
+      }
+      const res = await fetch(url);
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to load form'); setLoading(false); return; }
       setBill(data.bill);
+      setGuestMode(data.guestMode || false);
       setCategories(data.categories);
       setLoading(false);
     } catch {
@@ -39,11 +47,6 @@ export default function FeedbackPage({ params }) {
 
   const setAnswer = (questionId, value) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
-  };
-
-  const isCurrentStepComplete = () => {
-    if (!currentCategory) return false;
-    return currentCategory.questions.every(q => !q.is_required || answers[q.id]);
   };
 
   const goNext = () => {
@@ -78,7 +81,13 @@ export default function FeedbackPage({ params }) {
       const res = await fetch('/api/feedback/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ billId, guestType, visitPurpose, stayDuration, answers }),
+        body: JSON.stringify({
+          billId: guestMode ? null : billId,
+          guestType,
+          visitPurpose,
+          stayDuration,
+          answers,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -115,7 +124,23 @@ export default function FeedbackPage({ params }) {
     );
   }
 
+  if (totalSteps === 0) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.centerMessage}>
+          <p className={styles.infoText}>No categories available for feedback.</p>
+          <button onClick={() => handleSubmit()} className={styles.ghostBtn} disabled={submitting}>
+            {submitting ? 'Submitting...' : 'Submit Empty Feedback'}
+          </button>
+          <button onClick={() => router.push('/')} className={styles.ghostBtn}>Go Back</button>
+        </div>
+      </main>
+    );
+  }
+
   const isLastStep = currentStep === totalSteps - 1;
+  const answeredCount = currentCategory ? currentCategory.questions.filter(q => answers[q.id]).length : 0;
+  const totalQuestions = currentCategory ? currentCategory.questions.length : 0;
 
   return (
     <main className={styles.main}>
@@ -128,7 +153,9 @@ export default function FeedbackPage({ params }) {
           </svg>
           Exit
         </button>
-        <span className={styles.billLabel}>{bill?.bill_number}</span>
+        <span className={styles.billLabel}>
+          {guestMode ? 'GUEST' : bill?.bill_number}
+        </span>
       </div>
 
       <div className={styles.formArea}>
@@ -143,6 +170,9 @@ export default function FeedbackPage({ params }) {
           {currentCategory && (
             <div key={currentCategory.id} className={`${styles.categoryBlock} ${direction === 'next' ? styles.slideRight : styles.slideLeft}`}>
               <h2 className={styles.categoryTitle}>{currentCategory.name.toUpperCase()}</h2>
+              <p className={styles.categoryHint}>
+                {answeredCount}/{totalQuestions} answered — all optional
+              </p>
 
               <div className={styles.questions}>
                 {currentCategory.questions.map((question, qIdx) => (
@@ -169,7 +199,7 @@ export default function FeedbackPage({ params }) {
             </div>
           )}
 
-          {/* Navigation */}
+          {/* Navigation — always enabled */}
           <div className={styles.nav}>
             <button onClick={goPrev} disabled={currentStep === 0} className={styles.backBtn}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -178,7 +208,7 @@ export default function FeedbackPage({ params }) {
               Back
             </button>
             {isLastStep ? (
-              <button onClick={handleSubmit} disabled={submitting || !isCurrentStepComplete()} className={styles.nextBtn}>
+              <button onClick={handleSubmit} disabled={submitting} className={styles.nextBtn}>
                 {submitting ? <span className={styles.spinner}/> : 'Submit'}
                 {!submitting && (
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -187,7 +217,7 @@ export default function FeedbackPage({ params }) {
                 )}
               </button>
             ) : (
-              <button onClick={goNext} disabled={!isCurrentStepComplete()} className={styles.nextBtn}>
+              <button onClick={goNext} className={styles.nextBtn}>
                 Next
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

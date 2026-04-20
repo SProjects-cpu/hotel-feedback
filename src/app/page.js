@@ -1,35 +1,58 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
-const TEST_BILLS = ['BILL-2026-001', 'BILL-2026-002', 'BILL-2026-003', 'BILL-2026-005'];
-
 export default function HomePage() {
+  const [useBillId, setUseBillId] = useState(false);
   const [billNumber, setBillNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
   const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/feedback/services')
+      .then(r => r.json())
+      .then(data => setServices(data.services || []))
+      .catch(() => {});
+  }, []);
+
+  const toggleService = (name) => {
+    setSelectedServices(prev =>
+      prev.includes(name) ? prev.filter(s => s !== name) : [...prev, name]
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!billNumber.trim()) { setError('Please enter your bill number'); return; }
     setLoading(true);
     setError('');
-    try {
-      const res = await fetch(`/api/feedback/validate-bill?billNumber=${encodeURIComponent(billNumber.trim())}`);
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Invalid bill number'); setLoading(false); return; }
-      router.push(`/feedback/${data.billId}`);
-    } catch {
-      setError('Connection error. Please try again.');
-      setLoading(false);
+
+    if (useBillId && billNumber.trim()) {
+      // Bill-based flow
+      try {
+        const res = await fetch(`/api/feedback/validate-bill?billNumber=${encodeURIComponent(billNumber.trim())}`);
+        const data = await res.json();
+        if (!res.ok) { setError(data.error || 'Invalid bill number'); setLoading(false); return; }
+        router.push(`/feedback/${data.billId}`);
+      } catch {
+        setError('Connection error. Please try again.');
+        setLoading(false);
+      }
+    } else {
+      // Guest mode — pass selected categories via query params
+      const params = new URLSearchParams();
+      if (selectedServices.length > 0) {
+        params.set('services', selectedServices.join(','));
+      }
+      router.push(`/feedback/guest${params.toString() ? '?' + params.toString() : ''}`);
     }
   };
 
   return (
     <main className={styles.main}>
-      {/* Background watermark */}
       <div className={styles.watermark}>FEEDBACK</div>
 
       <div className={styles.content}>
@@ -41,7 +64,6 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Card */}
         <div className={styles.card}>
           <p className={styles.stepLabel}>GUEST FEEDBACK</p>
           <div className={styles.progressTrack}>
@@ -49,22 +71,57 @@ export default function HomePage() {
           </div>
 
           <h1 className={styles.title}>SHARE YOUR EXPERIENCE</h1>
-          <p className={styles.desc}>Enter your bill number to begin your personalized feedback form.</p>
+          <p className={styles.desc}>Select the services you used and share your feedback. All fields are optional.</p>
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.inputWrapper}>
+            {/* Bill ID Checkbox */}
+            <label className={styles.checkboxRow}>
               <input
-                type="text"
-                value={billNumber}
-                onChange={(e) => { setBillNumber(e.target.value.toUpperCase()); setError(''); }}
-                placeholder="BILL-2026-XXXX"
-                className={styles.input}
-                autoFocus
+                type="checkbox"
+                checked={useBillId}
+                onChange={() => { setUseBillId(!useBillId); setError(''); }}
+                className={styles.checkbox}
               />
-            </div>
+              <span>I have a Bill ID</span>
+            </label>
+
+            {/* Bill Number Input (conditional) */}
+            {useBillId && (
+              <div className={styles.inputWrapper}>
+                <input
+                  type="text"
+                  value={billNumber}
+                  onChange={(e) => { setBillNumber(e.target.value.toUpperCase()); setError(''); }}
+                  placeholder="BILL-2026-XXXX"
+                  className={styles.input}
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* Category Selection (when no bill) */}
+            {!useBillId && (
+              <div className={styles.categorySection}>
+                <p className={styles.catLabel}>SELECT SERVICES YOU USED</p>
+                <p className={styles.catHint}>Optional — leave empty to see all categories</p>
+                <div className={styles.chips}>
+                  {services.map(svc => (
+                    <button
+                      key={svc.name}
+                      type="button"
+                      className={`${styles.chip} ${selectedServices.includes(svc.name) ? styles.chipActive : ''}`}
+                      onClick={() => toggleService(svc.name)}
+                    >
+                      {svc.display_name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {error && <p className={styles.error}>{error}</p>}
 
-            <button type="submit" className={styles.submitBtn} disabled={loading || !billNumber.trim()}>
+            <button type="submit" className={styles.submitBtn} disabled={loading || (useBillId && !billNumber.trim())}>
               {loading ? <span className={styles.loader}/> : (
                 <>
                   Start Feedback
@@ -76,14 +133,17 @@ export default function HomePage() {
             </button>
           </form>
 
-          <div className={styles.testSection}>
-            <p className={styles.testLabel}>Try a demo bill</p>
-            <div className={styles.chips}>
-              {TEST_BILLS.map(b => (
-                <button key={b} className={styles.chip} onClick={() => setBillNumber(b)}>{b}</button>
-              ))}
+          {/* Demo bills section only when bill mode is on */}
+          {useBillId && (
+            <div className={styles.testSection}>
+              <p className={styles.testLabel}>Try a demo bill</p>
+              <div className={styles.chips}>
+                {['BILL-2026-001', 'BILL-2026-002', 'BILL-2026-003'].map(b => (
+                  <button key={b} className={styles.chip} onClick={() => setBillNumber(b)}>{b}</button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </main>

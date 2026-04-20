@@ -11,21 +11,24 @@ function getSupabase() {
 export async function POST(request) {
   try {
     const { billId, guestType, visitPurpose, stayDuration, answers } = await request.json();
-    if (!billId || !answers) {
-      return NextResponse.json({ error: 'Missing required data' }, { status: 400 });
-    }
 
     const supabase = getSupabase();
+    const isGuestMode = !billId || billId === 'guest';
 
     // Create feedback response
+    const insertData = {
+      guest_type: guestType || null,
+      visit_purpose: visitPurpose || null,
+      stay_duration: stayDuration || null,
+    };
+
+    if (!isGuestMode) {
+      insertData.bill_id = billId;
+    }
+
     const { data: response, error: respError } = await supabase
       .from('feedback_responses')
-      .insert({
-        bill_id: billId,
-        guest_type: guestType || null,
-        visit_purpose: visitPurpose || null,
-        stay_duration: stayDuration || null,
-      })
+      .insert(insertData)
       .select('id')
       .single();
 
@@ -37,14 +40,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Failed to save feedback' }, { status: 500 });
     }
 
-    // Insert all answers
-    const answerRows = Object.entries(answers).map(([questionId, answer]) => ({
-      response_id: response.id,
-      question_id: questionId,
-      answer: answer,
-    }));
+    // Insert answers (if any provided)
+    const answerEntries = answers ? Object.entries(answers) : [];
+    if (answerEntries.length > 0) {
+      const answerRows = answerEntries.map(([questionId, answer]) => ({
+        response_id: response.id,
+        question_id: questionId,
+        answer: answer,
+      }));
 
-    if (answerRows.length > 0) {
       const { error: ansError } = await supabase
         .from('feedback_answers')
         .insert(answerRows);
@@ -55,11 +59,13 @@ export async function POST(request) {
       }
     }
 
-    // Mark bill as feedback submitted
-    await supabase
-      .from('bills')
-      .update({ is_feedback_submitted: true })
-      .eq('id', billId);
+    // Mark bill as feedback submitted (only if bill-based)
+    if (!isGuestMode) {
+      await supabase
+        .from('bills')
+        .update({ is_feedback_submitted: true })
+        .eq('id', billId);
+    }
 
     return NextResponse.json({ success: true, responseId: response.id });
   } catch (err) {
